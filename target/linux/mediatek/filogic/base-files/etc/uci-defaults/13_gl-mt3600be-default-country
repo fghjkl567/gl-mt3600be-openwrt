@@ -1,3 +1,4 @@
+#!/bin/sh
 . /lib/functions.sh
 
 [ "$(board_name)" = "glinet,gl-mt3600be" ] || exit 0
