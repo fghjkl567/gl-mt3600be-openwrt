@@ -29,7 +29,7 @@ jobs:
       - name: Checkout integration branch
         uses: actions/checkout@v4
         with:
-          ref: beryl7-25.12.6-merged
+          ref: ${{ github.sha }}
           submodules: recursive
 
       - name: Fetch pinned Beryl 7 fan controller
@@ -60,6 +60,8 @@ jobs:
           sh -n scripts/prepare-beryl7-fancontrol.sh
           sh -n target/linux/mediatek/filogic/base-files/etc/hotplug.d/iface/99-gl-mt3600be-wan-eee
           sh -n target/linux/mediatek/filogic/base-files/etc/uci-defaults/13_gl-mt3600be-default-country
+          sh -n package/luci-app-h5000m-fancontrol/root/usr/sbin/h5000m-fancontrol
+          sh -n package/luci-app-h5000m-fancontrol/root/etc/init.d/h5000m-fancontrol
 
       - name: Build firmware
         run: |
