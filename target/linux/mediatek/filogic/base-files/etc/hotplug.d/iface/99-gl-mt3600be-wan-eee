@@ -1,7 +1,12 @@
 #!/bin/sh
 # Disable Energy Efficient Ethernet on the GL-MT3600BE RTL8221B WAN PHY.
 # Board mapping: WAN=eth0, LAN=eth1.
-[ "$ACTION" = "ifup" ] || exit 0
+case "$ACTION" in
+ifup|ifupdate) ;;
+*) exit 0 ;;
+esac
+
+. /lib/functions.sh
 [ "$INTERFACE" = "wan" ] || exit 0
 [ "$(board_name)" = "glinet,gl-mt3600be" ] || exit 0
 
