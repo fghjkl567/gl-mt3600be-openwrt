@@ -1,12 +1,17 @@
 From: Beryl 7 integration <noreply@github.com>
-Subject: [PATCH] mt7996: always build host TXWI on MT7990
+Subject: [PATCH] mt7996: bypass broken SDO TX path on MT7990
 
-The MT7990 path can mishandle Ethernet-encapsulated TX frames when TXWI
-is left for firmware construction. Force the host to populate TXWI on
-MT7990 while retaining the upstream behavior for other MT799x devices.
+The connac3 SDO firmware path builds TX descriptors for normal 802.3
+unicast data frames. On MT7990 this path can produce malformed TX
+descriptor/rate fields and severely reduce AP-to-client throughput.
 
-This is deliberately scoped to MT7990; do not change TX descriptor
-handling for MT7992/MT7996 devices.
+Force host TXWI/TXD generation for MT7990 only. Keep the SDO path
+unchanged for MT7996 and MT7992.
+
+This is the host-fill workaround described in openwrt/mt76 issues #1043
+and #1065, adapted to the host_txd boolean used by the pinned mt76
+revision. The equivalent upstream behavior was present before SDO was
+re-enabled (commit 325a0c49); commit 55218e6 re-enabled SDO.
 
 --- a/mt7996/mac.c
 +++ b/mt7996/mac.c
@@ -14,7 +19,7 @@ handling for MT7992/MT7996 devices.
  
  	/* mt76_tx_status_skb_add() clears info->control.flags */
 -	host_txd = !is_8023 ||
-+	host_txd = is_mt7990(&dev->mt76) || !is_8023 ||
++	host_txd = !is_8023 || is_mt7990(&dev->mt76) ||
  		   (info->control.flags & (IEEE80211_TX_CTRL_STREAM_CLASSIFIED |
  					   IEEE80211_TX_CTRL_EXPLICIT_UP));
  
