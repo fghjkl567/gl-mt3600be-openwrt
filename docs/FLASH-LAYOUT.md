@@ -91,3 +91,26 @@ until the physical pinout and electrical levels are independently verified.
 
 No flashing, partition writes, environment changes, BL2/FIP updates or
 bootloader replacement are part of this audit.
+
+
+## Comparison with MediaTek MT7987 SDK examples
+
+The public MediaTek OpenWrt 25.12 guide documents MT7987 reference-platform
+bootloader variants for both NMBM and FULL-UBI. It explicitly warns that
+NMBM and FULL-UBI bootloaders/images are not interchangeable, and that the
+matching bootloader storage scheme must be selected.
+
+Its sample MT7987 NMBM map places UBI at 0x780000, while this Beryl 7 Linux DTS
+declares separate `log` and `CFG` regions from 0x780000 through 0x800000,
+then starts UBI at 0x800000. This is a material difference. The MediaTek RFB
+example is **not** a substitute for the Beryl 7 layout and must not be used to
+derive flashing offsets or choose BL2/FIP images for this router.
+
+Reference:
+- MediaTek `mtk-openwrt-feeds`, `MediaTek_OpenWrt_2512_User_Guide.md`,
+  sections “Key Differences to OpenWrt Official U-boot” and “SPIM-NAND
+  Procedure”: https://github.com/mediatek/mtk-openwrt-feeds/blob/main/autobuild/unified/doc/MediaTek_OpenWrt_2512_User_Guide.md
+
+This comparison increases the priority of obtaining exact factory Beryl 7
+artifacts and read-only device-side MTD/NMBM observations before any bootloader
+build or recovery-image work.
