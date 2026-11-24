@@ -12,6 +12,7 @@ on:
       - 'include/**'
       - 'tools/**'
       - 'config/**'
+      - 'scripts/**'
 
 permissions:
   contents: read
