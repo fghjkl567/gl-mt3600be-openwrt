@@ -51,6 +51,7 @@ jobs:
           CONFIG_TARGET_mediatek=y
           CONFIG_TARGET_mediatek_filogic=y
           CONFIG_TARGET_mediatek_filogic_DEVICE_glinet_gl-mt3600be=y
+          CONFIG_PACKAGE_luci-app-h5000m-fancontrol=m
           EOF
           make defconfig
 
@@ -82,5 +83,6 @@ jobs:
           path: |
             bin/targets/mediatek/filogic/*gl-mt3600be*
             bin/targets/mediatek/filogic/SHA256SUMS-beryl7
+            bin/packages/*/luci/luci-app-h5000m-fancontrol*.apk
           if-no-files-found: error
           retention-days: 14

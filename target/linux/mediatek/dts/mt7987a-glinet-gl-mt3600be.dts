@@ -82,16 +82,6 @@
 	};
 };
 
-/*
- * Fan PWM is owned by the Beryl 7 userspace fan controller.
- * Preserve CPU frequency cooling and the hot/critical trips from mt7987.dtsi.
- */
-&{/thermal-zones/cpu-thermal/cooling-maps} {
-	/delete-node/ cpu-active-high;
-	/delete-node/ cpu-active-low;
-	/delete-node/ cpu-passive;
-};
-
 &fan {
 	fan-supply = <&fan_3p3v>;
 	interrupt-parent = <&pio>;
