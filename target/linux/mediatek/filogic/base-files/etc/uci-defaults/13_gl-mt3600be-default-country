@@ -1,0 +1,25 @@
+. /lib/functions.sh
+
+[ "$(board_name)" = "glinet,gl-mt3600be" ] || exit 0
+
+country_changed=0
+
+set_default_country() {
+	local section="$1"
+	local country
+
+	config_get country "$section" country
+	case "$country" in
+		""|00)
+			uci set "wireless.$section.country=RU"
+			country_changed=1
+			;;
+	esac
+}
+
+config_load wireless
+config_foreach set_default_country wifi-device
+
+[ "$country_changed" -eq 0 ] || uci commit wireless
+
+exit 0
