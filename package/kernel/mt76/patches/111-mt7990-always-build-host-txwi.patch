@@ -1,0 +1,20 @@
+From: Beryl 7 integration <noreply@github.com>
+Subject: [PATCH] mt7996: always build host TXWI on MT7990
+
+The MT7990 path can mishandle Ethernet-encapsulated TX frames when TXWI
+is left for firmware construction. Force the host to populate TXWI on
+MT7990 while retaining the upstream behavior for other MT799x devices.
+
+This is deliberately scoped to MT7990; do not change TX descriptor
+handling for MT7992/MT7996 devices.
+
+--- a/mt7996/mac.c
++++ b/mt7996/mac.c
+@@ -1143,7 +1143,7 @@ int mt7996_tx_prepare_skb(struct mt76_dev *mdev, void *txwi_ptr,
+ 
+ 	/* mt76_tx_status_skb_add() clears info->control.flags */
+-	host_txd = !is_8023 ||
++	host_txd = is_mt7990(&dev->mt76) || !is_8023 ||
+ 		   (info->control.flags & (IEEE80211_TX_CTRL_STREAM_CLASSIFIED |
+ 					   IEEE80211_TX_CTRL_EXPLICIT_UP));
+ 
