@@ -21,14 +21,14 @@ Must be based on the exact official OpenWrt 25.12.6 source/ImageBuilder and SDK 
 - Treat any change to kernel code, kernel config, vermagic, symbol CRCs or module ABI as a compatibility break.
 - Do not mix the Performance kernel patches into this profile.
 
-## 4PDA changes to integrate and validate
+## 4PDA changes: implementation status
 
-1. mt76 TXWI fix described in 4PDA and linked to mt76 issue #1043. Check whether the fix is already present in this branch before applying it; avoid duplicate or conflicting patches.
-2. Fan: inspect the GL-MT3600BE DTS thermal/pwm-fan nodes and the FAN789 fancontrol implementation. Only remove automatic fan operating points after confirming the userspace daemon has safe startup, sensor discovery and failure behavior.
-3. WAN EEE: inspect the actual RTL8221B WAN interface mapping and apply EEE-off idempotently. Do not assume eth0 without verifying board configuration.
-4. Wi-Fi country: set RU only as a first-boot default where country is unset/00; never overwrite an explicit user country on sysupgrade. Regulatory configuration must remain subject to local law and device calibration.
-5. Open Wi-Fi: do not enable an unauthenticated AP in release images. Require credentials or keep radios disabled until initial setup is complete.
-6. Include LuCI, fancontrol and ethtool only after package source, license, dependencies and service behavior are reviewed.
+- **MT7990 TXWI:** added `package/kernel/mt76/patches/111-mt7990-always-build-host-txwi.patch`. It forces host TXWI generation only when `is_mt7990()` is true, leaving other MT799x variants unchanged. Source is pinned by `package/kernel/mt76/Makefile` to mt76 commit `0936617dc529ff9da0385221d3fa6de732231177`. This still requires a clean patch-application/build test and on-device IPv4 NAT throughput test.
+- **WAN EEE:** added `ethtool` to the GL-MT3600BE image package list and an iface hotplug hook that disables EEE on WAN `eth0` after `ifup`/`ifupdate`. The board mapping in `02_network` confirms WAN=`eth0`, LAN=`eth1`. Runtime support must still be verified on the actual RTL8221B PHY.
+- **Wi-Fi country:** added a board-specific uci-defaults script that sets RU only when a radio's country is empty or `00`. An explicit country is not overwritten. Set the country required by the jurisdiction where the router is operated; RU is the recipe's default, not a regulatory exemption.
+- **Fan:** not yet integrated. The SoC DTSI defines `pwm-fan` plus three fan cooling maps (`cpu-active-high`, `cpu-active-low`, `cpu-passive`) and separate CPU cooling at 117 °C, hot at 120 °C and critical at 125 °C. FAN789's current `luci-app-h5000m-fancontrol` release is documented for Hiveton H5000M, not GL-MT3600BE; its fallback thermal thresholds are H5000M-specific. Do not remove Beryl 7 fan cooling maps or ship the app until its sensor discovery and 117/125 °C safety floors are adapted and tested for this board.
+- **Open Wi-Fi:** deliberately not enabled. Release images must not ship an unauthenticated default AP.
+- **LuCI/fancontrol:** add only after the Beryl-specific adaptation and package integration are complete. `ethtool` is already included for the WAN workaround.
 
 ## Release safety gates
 
@@ -41,4 +41,4 @@ Must be based on the exact official OpenWrt 25.12.6 source/ImageBuilder and SDK 
 
 ## Current status
 
-The repository fork and integration branch exist. This document records the intended split and release gates. The first CI job is a reproducible build check for the existing Performance source base; the Compatible profile and 4PDA patch integration are not yet implemented.
+The fork and integration branch exist. CI infrastructure is present. Initial integration commits add the MT7990-scoped TXWI patch, WAN EEE workaround and first-boot country default. These changes have not yet passed a clean build or hardware validation. The fan-control app and Compatible profile remain pending.
