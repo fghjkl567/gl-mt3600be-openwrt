@@ -10,7 +10,7 @@ handling for MT7992/MT7996 devices.
 
 --- a/mt7996/mac.c
 +++ b/mt7996/mac.c
-@@ -1143,7 +1143,7 @@ int mt7996_tx_prepare_skb(struct mt76_dev *mdev, void *txwi_ptr,
+@@ -1143,6 +1143,6 @@ int mt7996_tx_prepare_skb(struct mt76_dev *mdev, void *txwi_ptr,
  
  	/* mt76_tx_status_skb_add() clears info->control.flags */
 -	host_txd = !is_8023 ||
